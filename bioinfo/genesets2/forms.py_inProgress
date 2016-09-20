@@ -1,0 +1,69 @@
+from django import forms
+from django.utils.safestring import mark_safe
+
+from models import Genesets2
+
+# Options for sources from which to load.
+# Note: empty source choices will allow for the downloading of empty
+#       alternatively-formatted output (like CSV and xml). gssearch()
+#       has logic to prevent this
+
+def genSortedList(obj, col):
+    '''Generate a list of options, sorted by their occurence, suitable for
+    inclusion as a 'choices' entry.
+    "obj" refers to which Model subset to select from
+    "col" is the column to use'''
+
+    # Include all
+    ret = [('all', 'All')]
+    vals = obj.order_by(col)..values_list(col).distinct()
+    getCount = lambda x: obj.order_by(col).
+
+def gen_source_choices():
+    ret = [('all', 'All')]
+
+    allSources =
+    Genesets2.objects.all().order_by("source").distinct("source").values_list("source")
+
+    # Sort by occurence
+    sorter = lambda x: Genesets2.objects.all().order_by(x).
+    allSources = sorted(allSources, key=
+
+source_choices = gen_source_choices()
+
+
+
+encoding_choices = (('html','Web Page'),
+                  ('csv','CSV (includes additional fields)'),
+                  ('xml', 'XML (includes additional fields)'),
+                  ('json', 'JSON (includes additional fields)'),)
+
+species_choices = [('all','all')]
+species_choices.extend(Genesets2.objects.all().order_by("species").distinct("species").values_list("species", "species"))
+
+class HorizontalRadioRenderer(forms.RadioSelect.renderer):
+      def render(self):
+              return mark_safe(u'\n'.join([u'%s\n' % w for w in self]))
+
+class SearchForm(forms.Form):
+    search = forms.CharField(required=False,max_length=100, min_length=0,
+                             help_text='''
+                             <br>Fields searched: Geneset label, First Author,
+                             Brief Description, Genes, Gene Symbols and
+                             Citation.<br>
+                             Examples (remove quotes when using): Gene names (like "WRKY" or "WRKY TUB5"),
+                             keywords (like "cold"), or first authors (like
+                             "Mueller")''')
+    sources = forms.ChoiceField(required=True,
+                widget = forms.RadioSelect(renderer=HorizontalRadioRenderer),
+                choices=source_choices, initial="all")
+    encoding = forms.ChoiceField(label='Format', choices=encoding_choices,
+                                 initial='html')
+
+    species = forms.ChoiceField(required=True, label="Species", choices = species_choices)
+
+   # sources = forms.ChoiceField(required=True,
+   #             widget = forms.RadioSelect(renderer=HorizontalRadioRenderer,
+   #             attrs= {'onclick' : 'this.form.submit();'}),
+   #             choices=source_choices, initial="all")
+

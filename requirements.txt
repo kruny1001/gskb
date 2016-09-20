@@ -1,0 +1,11 @@
+Django==1.5
+psycopg2
+werkzeug
+ipython
+MySQL_python
+django_extensions
+python-memcached
+ipdb
+unicodecsv
+rpy2
+singledispatch # For rpy2

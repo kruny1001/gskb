@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+{% block head %}{% endblock %}
+<STYLE TYPE="text/css" MEDIA="screen, projection">
+      @import url(/kate.css);
+      @import url(/sitenav.css);
+</STYLE>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<center>
+<img class="rounded-corners" src="/graphics/Headersmall3.jpg"/>
+
+<table>
+	<tr><td><a class="nav" href="http://www.sdstate.edu/mathstat/bioinformatics/">SDSU Bioinformatics Homepage</a></td>
+	<td><a class="nav" href="/arapath/">Arapath Homepage</a></td>
+	</tr>
+</table><br>
+</center>
+
+{% block content %}{% endblock %}
+
+{% block footer %}
+<center>
+	<table cellspacing="0" cellpadding="0">
+	<tbody>
+		<tr>
+		<td><img src="/graphics/footer_a.jpg"/></td>
+		<td><img src="/graphics/footer_b.jpg"/></td>
+		<td><img src="/graphics/footer_c.jpg"/></td>
+		<td><img src="/graphics/footer_d.jpg"/></td>
+		</tr>
+	</tbody>
+	</table>
+</center>
+{% endblock %}
+
+</body>
+</html>

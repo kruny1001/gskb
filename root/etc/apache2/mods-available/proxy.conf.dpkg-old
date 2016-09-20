@@ -1,0 +1,31 @@
+<IfModule mod_proxy.c>
+        #turning ProxyRequests on and allowing proxying from all may allow
+        #spammers to use your proxy to send email.
+
+        ProxyRequests Off
+#Do_I_need_this? ProxyPreserveHost On
+
+        <Proxy *>
+                AddDefaultCharset off
+                Order deny,allow
+                Deny from all
+                #Allow from localhost
+                Allow from 137.216.209.70
+        </Proxy>
+
+        # Enable/disable the handling of HTTP/1.1 "Via:" headers.
+        # ("Full" adds the server version; "Block" removes all outgoing Via: headers)
+        # Set to one of: Off | On | Full | Block
+
+        ProxyVia On
+
+
+#wikidot test stuff:
+#ProxyPass /edemo/wikid/ http://127.0.0.1:8080/
+#ProxyPassReverse /edemo/wikid/ http://127.0.0.1:8080/
+ProxyPass /edemo/wikid/ http://localhost:8080/
+ProxyPassReverse /edemo/wikid/ http://localhost:8080/
+ProxyPassReverseCookieDomain localhost bioinformatics.sdstate.edu
+ProxyPassReverseCookiePath / /edemo/wikid/
+## ProxyPassReverseCookieDomain is not needed....?
+</IfModule>

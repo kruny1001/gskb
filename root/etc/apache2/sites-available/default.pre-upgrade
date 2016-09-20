@@ -1,0 +1,84 @@
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /wwwdata
+	# Deny outside of web hierarchy
+	<Directory />
+		Order Deny,Allow
+		Deny from all
+		Options None
+		AllowOverride None
+	</Directory>
+	<Directory /wwwdata>
+		Options None
+		AllowOverride Limit
+		Order allow,deny
+		allow from all
+	</Directory>
+	<Directory /wwwdata/js/>
+		Options FollowSymLinks
+	</Directory>
+
+	<Directory /wwwdata/webstats/>
+		AllowOverride Limit AuthConfig
+		Options +SymLinksIfOwnerMatch -Indexes
+	</Directory>
+
+	<Directory /wwwdata/users/jason>
+		AllowOverride All
+	</Directory>
+
+	<Directory /wwwdata/datasets>
+		Options +Indexes
+	</Directory>
+
+#	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+#	<Directory "/usr/lib/cgi-bin">
+#		AllowOverride None
+#		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+#		Order allow,deny
+#		Allow from all
+#	</Directory>
+
+	<Directory /wwwdata/apps>
+		Order Deny,Allow
+		Deny from all
+		Options None
+		AllowOverride None
+	</Directory>
+
+        <Location /arapath/>
+                SetHandler python-program
+		PythonHandler django.core.handlers.modpython
+		SetEnv DJANGO_SETTINGS_MODULE bioinfo.settings
+		PythonPath "['/wwwdata/apps', '/wwwdata/apps/bioinfo'] + sys.path"
+		#Disable these two for production usage
+		PythonAutoReload Off
+		PythonDebug Off
+	</Location>
+
+	# Static files for /arapath are located in /arapath/db
+	<Location /arapath/db>
+		SetHandler None
+	</Location>
+
+	# Enable client caching
+	<IfModule mod_expires.c>
+		ExpiresActive on
+		ExpiresByType image/gif "access plus 1 months"
+		ExpiresByType image/jpeg "access plus 1 months"
+		ExpiresByType application/javascript "access plus 1 months"
+		ExpiresByType text/css "access plus 2 weeks"
+		ExpiresDefault "access plus 10 minutes"
+	</IfModule>
+
+
+	ErrorLog /var/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog /var/log/apache2/access.log combined
+
+</VirtualHost>

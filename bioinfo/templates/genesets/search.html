@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% comment %}
+This template renders the search page for genesets
+{% endcomment %}
+
+{% block head %}
+	<script type="text/javascript" src="/js/jquery.js"></script>
+	<script type="text/javascript" id="js">$(document).ready(function() {
+		homeUrl = "/arapath/";
+		function strEndsWith(str, suffix) {
+			    return str.match(suffix+"$")==suffix;
+		}
+		if (strEndsWith(window.location.href,homeUrl))
+			$('a.nav[href="'+homeUrl+'"]').addClass('chosen').removeClass('nav');
+
+	});</script>
+
+	{% if searched %}
+	<script type="text/javascript" src="/js/jquery-tablesorter.js"></script>
+	<link rel="stylesheet" href="/js/themes/blue/style.css" type="text/css" id="" media="print, projection, screen" />
+	<script type="text/javascript" id="js">$(document).ready(function() {
+	// call the tablesorter plugin, the magic happens in the markup
+		$("table").tablesorter();
+	});</script>
+	{% endif %}
+{% endblock %}
+
+{% block title %}AraPath: a knowledgebase for pathway analysis in Arabidopsis{% endblock %}
+
+{% block content %}
+{% if not searched %}
+<H1>AraPath: a knowledgebase for pathway analysis in Arabidopsis</H1>
+<ul>
+	<li><a href="db/">Download Genesets</a></li>
+	<li><a href="all/">Browse All Genesets</a></li>
+</ul>
+{% endif %}
+<form action="" method="get">
+{{ form.as_p }}
+<br><input type="submit" value="Submit">
+<input type="reset" value="Reset">
+</form>
+
+{% if results %}
+    {% if show_all %}
+        <h2>Displaying all geneset entries
+	{% ifnotequal inSource "all" %}
+		from selected source
+	{% endifnotequal %}
+	 ({{ results|length }})</h2>
+    {% else %}
+        <h2>Found {{ results|length }} results!</h2>
+    {% endif %}
+
+Click on a heading to sort. Additional headings can be added by holding shift.
+
+<table class="tablesorter" id="geneset_results" summary="Results of your arapath search" border="1px">
+    <!-- Header Row -->
+    <thead>
+	    <tr><th width="95px">Source</th><th>Label</th>
+	    <th width="80px">Number of Genes</th><th width="40px">Year</th>
+	    <th>Citation</th></tr>
+    </thead>
+    <tbody>
+    {% for r in results %}
+        <tr><td>{{r.source}}</td>
+        <td><a href="{{link_prepend}}get?label={{ r.label|urlencode }}">{{r.label}}</a></td>
+        <td>{{r.ngenes}}</td>
+        <td>{{r.year}}</td>
+        <td>{{r.citation}}</tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %} {# if results #}
+    {% if searched %}
+    	<p><strong>No results returned
+	{% ifnotequal encoding 'html' %}
+	; no output available in {{encoding}} format
+	{% endifnotequal %}
+	</strong></p>
+    {% endif %}
+{% endif %} {# if results #}
+{% endblock %} {# block content #}
+
+{% block footer %}
+{% if not searched %}
+<br>
+<p>	<strong>Citing:  </strong>If you would like to cite Arapath for publication, please use:<br></p>
+	<blockquote>Lai L, Liberzon A, Hennessey J, Jiang G, Qi J, Mesirov JP, Ge SX: <b>AraPath: a knowledgebase for pathway analysis in Arabidopsis.</b><i>Bioinformatics</i> 2012, <b>28</b>:2291-2292. [<a href="http://bioinformatics.oxfordjournals.org/content/28/17/2291.full">link</a>]</blockquote>
+	{# Include standard footer #}
+	{{ block.super }}
+{% endif %}
+{% endblock %}

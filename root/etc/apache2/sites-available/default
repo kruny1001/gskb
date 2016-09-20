@@ -1,0 +1,118 @@
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /wwwdata
+	# Deny outside of web hierarchy
+	<Directory />
+		Order Deny,Allow
+		Deny from all
+		Options None
+		AllowOverride None
+	</Directory>
+	<Directory /wwwdata>
+		Options None
+		AllowOverride Limit
+		Order allow,deny
+		allow from all
+	</Directory>
+	<Directory /wwwdata/js/>
+		Options FollowSymLinks
+	</Directory>
+
+	<Directory /wwwdata/webstats/>
+		AllowOverride Limit AuthConfig
+		Options +SymLinksIfOwnerMatch +Indexes
+	</Directory>
+
+	<Directory /wwwdata/users/jason>
+		AllowOverride All
+	</Directory>
+
+	<Directory /wwwdata/datasets>
+		Options +Indexes
+	</Directory>
+
+#	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+#	<Directory "/usr/lib/cgi-bin">
+#		AllowOverride None
+#		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+#		Order allow,deny
+#		Allow from all
+#	</Directory>
+
+	# Necessary to keep the world from reading the django source stuff
+	# (which might have passwords)
+	<Directory /wwwdata/apps>
+		Order Deny,Allow
+		Deny from all
+		Options None
+		AllowOverride None
+	</Directory>
+
+        <Location /arapath/>
+                SetHandler python-program
+		PythonHandler django.core.handlers.modpython
+		SetEnv DJANGO_SETTINGS_MODULE bioinfo.settings
+		PythonPath "['/wwwdata/apps', '/wwwdata/apps/bioinfo'] + sys.path"
+		#Disable these two for production usage
+		PythonAutoReload Off
+		PythonDebug Off
+	</Location>
+
+	WSGIScriptAlias /gskb /wwwdata/apps/gskb/apache/django.wsgi
+	WSGIDaemonProcess gskb-1 user=gskb group=gskb processes=3 threads=1 maximum-requests=1500 inactivity-timeout=360000 display-name='%{GROUP}'
+	WSGIProcessGroup gskb-1
+	WSGIApplicationGroup %{GLOBAL}
+
+	RedirectMatch permanent ^/gskb$ /gskb/
+
+        <Location /gskb/>
+		Order allow,deny
+		Allow from all
+	</Location>
+
+	Alias /gskb/db/ "/wwwdata/gskb/db/"
+
+
+
+	# Static files for /arapath are located in /arapath/db
+	<Location /arapath/db>
+		SetHandler None
+	</Location>
+
+	#<Location /lc>
+	#	Order deny,allow
+	#	Deny from all
+	#	Allow from 137.216
+	#</Location>
+	
+
+	# Enable client caching
+	<IfModule mod_expires.c>
+		ExpiresActive on
+		ExpiresByType image/gif "access plus 1 months"
+		ExpiresByType image/jpeg "access plus 1 months"
+		ExpiresByType application/javascript "access plus 1 months"
+		ExpiresByType text/css "access plus 2 weeks"
+		ExpiresDefault "access plus 10 minutes"
+	</IfModule>
+
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    Alias /doc/ "/usr/share/doc/"
+    <Directory "/usr/share/doc/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+
+</VirtualHost>

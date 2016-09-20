@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% comment %}
+This template renders the page for an individual geneset
+{% endcomment %}
+
+{% block title %}Geneset {{g.label}}{% endblock %}
+
+{% block content %}
+<h1>Geneset {{g.label}}</h1>
+
+<table>
+    {% for f in exportFields %}
+    <tr><th>{{ f.0 }}</th><td>{{ f.1|safe }}</td></tr>
+    {% endfor %}
+
+{% endblock %}
