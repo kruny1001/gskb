@@ -61,7 +61,5 @@ RUN mkdir /code
 WORKDIR /code
 ADD requirements.txt /code/
 ADD createDB.sql /code/
-RUN mkdir -p /var/run/mysqld
-RUN chmod -R 777 /var/run/mysqld
 RUN pip install -r requirements.txt
 ADD . /code/

@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+mkdir -p /var/run/mysqld
+chmod -R 777 /var/run/mysqld
+
 # if command starts with an option, prepend mysqld
 if [ "${1:0:1}" = '-' ]; then
 	set -- mysqld "$@"
@@ -69,6 +72,8 @@ if [ "$1" = 'mysqld' ]; then
 			GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;
 			DROP DATABASE IF EXISTS test ;
 			FLUSH PRIVILEGES ;
+
+
 		EOSQL
 		if [ ! -z "$MYSQL_ROOT_PASSWORD" ]; then
 			mysql+=( -p"${MYSQL_ROOT_PASSWORD}" )
@@ -87,6 +92,34 @@ if [ "$1" = 'mysqld' ]; then
 			fi
 
 			echo 'FLUSH PRIVILEGES ;' | "${mysql[@]}"
+
+
+			echo "use $MYSQL_DATABASE;
+				CREATE TABLE `gskb` (
+			  `label` varchar(255) NOT NULL,
+			  `species` varchar(255) NOT NULL,
+			  `source` varchar(255) NOT NULL,
+			  `regType` enum('different','down','up') DEFAULT NULL,
+			  `chip` varchar(255) DEFAULT NULL,
+			  `detailsUrl` text,
+			  `nGenes` smallint(4) unsigned NOT NULL,
+			  `descriptionBrief` text NOT NULL,
+			  `descriptionFull` text,
+			  `pubmed` varchar(20) DEFAULT NULL,
+			  `firstAuthor` varchar(255) DEFAULT NULL,
+			  `paperTitle` text,
+			  `year` decimal(4,0) DEFAULT NULL,
+			  `citation` tinytext,
+			  `comment` tinytext,
+			  `genes` mediumtext NOT NULL,
+			  `genesSym` mediumtext NOT NULL,
+			  PRIMARY KEY (`label`),
+			  KEY `gskb_species_idx` (`species`),
+			  KEY `gskb_source_idx` (`source`),
+			  FULLTEXT KEY `gskb_fulltext_idx` (`label`,`firstAuthor`,`descriptionBrief`,`genes`,`genesSym`,`citation`),
+			  FULLTEXT KEY `gskb_genesym_fulltext_idx` (`genesSym`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=1 ;
+			"
 		fi
 
 		echo
