@@ -26,7 +26,8 @@ Your current directory must be at gskb project folder.
 ```
 docker-compose ps
 ```
-   Name                 Command                 State               Ports          
-----------------------------------------------------------------------------------
-gskb_db_1    docker-entrypoint.sh mysqld      Restarting   0.0.0.0:32768->3306/tcp
-gskb_web_1   python manage.py runserver ...   Up           0.0.0.0:7000->7000/tcp  
+
+|   Name     |            Command            |     State   |            Ports          
+|----------------------------------------------------------------------------------
+|gskb_db_1   |docker-entrypoint.sh mysqld    |  Up |  0.0.0.0:32768->3306/tcp
+|gskb_web_1  |python manage.py runserver ... |  Up         |  0.0.0.0:7000->7000/tcp  
