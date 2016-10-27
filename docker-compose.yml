@@ -1,0 +1,23 @@
+version: '2'
+services:
+  db:
+    restart: always
+    image: mysql:5.7
+    ports:
+      - "3306"
+    volumes:
+      - "./.data/db:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: django
+      MYSQL_DATABASE: django
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:7000
+    volumes:
+      - .:/code
+    ports:
+      - "7000:7000"
+    links:
+      - db
